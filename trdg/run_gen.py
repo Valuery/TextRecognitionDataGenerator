@@ -211,7 +211,7 @@ def white_space_random(images):
     new_images = []
     for l in range(len(images)):
         img = Image.eval(images[l], lambda x: 255 - x)
-        img = img.crop((28,0,128,127))
+        
         distance = np.random.randint(-35,0)
 
         new_width = img.width + distance
