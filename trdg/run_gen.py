@@ -25,7 +25,7 @@ from straug.process import Posterize, Solarize, Invert, Equalize, AutoContrast, 
 
 from tqdm import tqdm
 
-DATA_DIR_ROOT = '../data/ETLCDB/'
+DATA_DIR_ROOT = '/home/anlab/Tienanh-backup/TrainHWJapanese/data/ETLCDB/'
 NUMBER_DATASET = 160
 
 data_format = None
@@ -181,7 +181,7 @@ white_blank_space_lv4 = Image.fromarray(img_4)
 
 
 
-bboxes = pkl.load(open("messi_ann.pkl", "rb"))
+bboxes = pkl.load(open("/home/anlab/Tienanh-backup/License_plate/messi_ann.pkl", "rb"))
 
 
 def resize(image_pil, width, height):
@@ -204,7 +204,62 @@ def resize(image_pil, width, height):
     background.paste(image_resize, offset)
     return background.convert('RGB')
 
+# def white_space_random(images): #06062022
+#     new_images = []
+#     for l in range(len(images)):
+#         img = Image.eval(images[l], lambda x: 255 - x)
+#         img = img.crop((28,0,128,127))
+#         # distance = np.random.randint(-30,0)
 
+#         new_width = img.width - 30
+#         new_img = Image.new("RGB", (new_width, 127), "white")
+#         new_img.paste(img,(0,0))
+#         # height_half = new_img.height*0.8
+#         # width_halft = new_img.width*0.8
+#         # size = width_halft, height_half
+#         # new_img.thumbnail(size, Image.ANTIALIAS)
+        
+#         # if choice == 0:
+#         #     new_width = img.width
+#         #     new_img = Image.new("RGB", (new_width, 127), "white")
+#         #     new_img.paste(img,(0,0))
+#         # elif choice == 1:
+#         #     new_width = img.width+white_blank_space_lv1.width
+#         #     new_img = Image.new("RGB", (new_width, 127), "white")
+#         #     new_img.paste(img,(0,0))
+#         #     new_img.paste(white_blank_space_lv1, (128,0))
+#         # elif choice ==2:
+#         #     new_width = img.width+white_blank_space_lv2.width
+#         #     new_img = Image.new("RGB", (new_width, 127), "white")
+#         #     new_img.paste(img,(0,0))
+#         #     new_img.paste(white_blank_space_lv2, (128,0))    
+#         # elif choice==3:
+#         #     new_width = img.width+white_blank_space_lv3.width
+#         #     new_img = Image.new("RGB", (new_width, 127), "white")
+#         #     new_img.paste(img,(0,0))
+#         #     new_img.paste(white_blank_space_lv3, (128,0))    
+
+#         # elif choice ==4:
+#         #     new_width = img.width+white_blank_space_lv4.width
+#         #     new_img = Image.new("RGB", (new_width, 127), "white")
+#         #     new_img.paste(img,(0,0))
+#         #     new_img.paste(white_blank_space_lv4, (128,0))    
+#         new_images.append(new_img)
+#     image_rotate = []
+#     for img in new_images:
+#         # img = np.array(img)
+#         # seq = Sequence([RandomRotate(8)])
+#         # img, _ = seq(img, bboxes)
+#         choice = random.uniform(0.85,1.15)
+#         img = resize(img, int(img.width*choice), int(img.height*choice))
+#         white = (255,255,255)
+#         angle = random.uniform(-10,10)
+#         img = img.rotate(angle, 0, expand = 1, fillcolor = white)
+        
+#         # img = Image.fromarray(img)
+#         # img.show()
+#         image_rotate.append(img)    
+#     return image_rotate
 
 
 def white_space_random(images):
@@ -217,7 +272,36 @@ def white_space_random(images):
         new_width = img.width + distance
         new_img = Image.new("RGB", (new_width, 127), "white")
         new_img.paste(img,(0,0))
+        # height_half = new_img.height*0.8
+        # width_halft = new_img.width*0.8
+        # size = width_halft, height_half
+        # new_img.thumbnail(size, Image.ANTIALIAS)
+        
+        # if choice == 0:
+        #     new_width = img.width
+        #     new_img = Image.new("RGB", (new_width, 127), "white")
+        #     new_img.paste(img,(0,0))
+        # elif choice == 1:
+        #     new_width = img.width+white_blank_space_lv1.width
+        #     new_img = Image.new("RGB", (new_width, 127), "white")
+        #     new_img.paste(img,(0,0))
+        #     new_img.paste(white_blank_space_lv1, (128,0))
+        # elif choice ==2:
+        #     new_width = img.width+white_blank_space_lv2.width
+        #     new_img = Image.new("RGB", (new_width, 127), "white")
+        #     new_img.paste(img,(0,0))
+        #     new_img.paste(white_blank_space_lv2, (128,0))    
+        # elif choice==3:
+        #     new_width = img.width+white_blank_space_lv3.width
+        #     new_img = Image.new("RGB", (new_width, 127), "white")
+        #     new_img.paste(img,(0,0))
+        #     new_img.paste(white_blank_space_lv3, (128,0))    
 
+        # elif choice ==4:
+        #     new_width = img.width+white_blank_space_lv4.width
+        #     new_img = Image.new("RGB", (new_width, 127), "white")
+        #     new_img.paste(img,(0,0))
+        #     new_img.paste(white_blank_space_lv4, (128,0))    
         new_images.append(new_img)
     image_rotate = []
     for img in new_images:
@@ -226,10 +310,11 @@ def white_space_random(images):
         # img, _ = seq(img, bboxes)
         choice = random.uniform(0.85,1.15)
         img = resize(img, int(img.width*choice), int(img.height*choice))
-
+        
         white = (255,255,255)
         angle = random.uniform(-10,10)
         img = img.rotate(angle, 0, expand = 1, fillcolor = white)
+        
         # img = Image.fromarray(img)
         # img.show()
         image_rotate.append(img)    
@@ -269,7 +354,107 @@ def produce_image_bg(height, width, image_dir):
     else:
         raise Exception("No images where found in the images folder!")
 
-# Cấu hình 2 06062022
+# # Cấu hình 2 06062022
+# def generate(text, count):
+#     if len(char_dict_8G) == 0:
+#         chars = read_chars(DATA_DIR_ROOT + 'ETL8G/chars.txt')
+#         # print("number char 8G = ", len(chars))
+#         for i in range(len(chars)):
+#             char_dict_8G[chars[i]] = i
+#     if len(char_dict_9G) == 0:
+#         chars = read_chars(DATA_DIR_ROOT + 'ETL9G/chars.txt')
+#         # print("number char 9G = ", len(chars))
+#         for i in range(len(chars)):
+#             char_dict_9G[chars[i]] = i
+    
+    
+#     images=[]
+#     for k in range(len(text)):
+#         if text[k] in char_dict_8G:
+#             indexDataFile = count // 5 + 1
+#             dataFile = DATA_DIR_ROOT + 'ETL8G/ETL8G_{:02d}'.format(indexDataFile)
+#             # print("dataFile = ", dataFile)
+#             etln_record = ETL8G_Record()
+#             index = char_dict_8G[text[k]] + 956*(count%5)
+#             # print("index=", index)
+#             f = bitstring.ConstBitStream(filename=dataFile)
+#             record = etln_record.read(f, index)
+#             char = etln_record.get_char()
+#             img = etln_record.get_image()
+#             images.append(img)
+        
+#         elif text[k] in char_dict_9G:
+#             indexDataFile = count // 4 + 1
+#             dataFile = DATA_DIR_ROOT + 'ETL9G/ETL9G_{:02d}'.format(indexDataFile)
+#             # print("dataFile = ", dataFile)
+#             etln_record = ETL9G_Record()
+#             index = char_dict_9G[text[k]] + 3036*(count%4)
+#             # print("index=", index)
+#             f = bitstring.ConstBitStream(filename=dataFile)
+#             record = etln_record.read(f, index)
+#             char = etln_record.get_char()
+#             img = etln_record.get_image()
+#             images.append(img)
+
+#         elif text[k] in char_dict_1C:
+#             etln_record = ETL167_Record()
+#         elif text[k]=='_':
+#             continue
+#         else:
+#             images.clear()
+#             break
+#     if len(images) > 0:
+#         images = white_space_random(images)
+#         w = 0
+#         h = 127
+#         for new_img in images:
+#             w = w + new_img.width
+#         # print(w)
+#         # w, h = images[0].width, images[0].height
+#         # index = 0
+#         # for i in range(len(text)):
+#         #     if text.isspace():
+#         #         w = w + white_blank_space_lv4.width
+#         #         index = i
+#         #     else:
+#         #         continue
+#         tiled = Image.new("RGB", (w, h), "white")
+#         tiled.save("bg.png")
+#         next_w = 0
+#         for l in range(len(images)):
+#             # if l == index:
+#             #     img = white_blank_space_lv4
+#             #     img_next = Image.eval(images[l], lambda x: x) 
+#             #     tiled.paste(img, (next_w, 0))
+#             #     next_w = next_w + img.width 
+#             #     tiled.paste(img, (next_w,0))
+#             #     next_w = next_w + img_next.width
+#             # else:
+#                 img = Image.eval(images[l], lambda x: x)
+#                 tiled.paste(img, (next_w, 0))
+#                 next_w = next_w + images[l].width
+#         tiled.save("tiledfn.png")
+#         #create RGBA image and RGB mask
+#         image = tiled.convert("RGBA") #Image.new("RGBA", (tiled.width, tiled.height), (0,0,0,0))
+#         datas = image.getdata()
+#         newData = []
+#         for item in datas:
+#             if item[0] >= 250 and item[1] >= 250 and item[2] >= 250:
+#                 newData.append((item[0], item[1], item[2], 0))
+#             else:
+#                 newData.append(item)
+#         image.putdata(newData)
+#         mask = tiled.convert("RGB")#Image.new("RGB", (tiled.width, tiled.height), (0, 0, 0))
+#     else:
+#         print("cannot generate this text: ", text)
+#         image = Image.new("RGBA", (50, 50), (0,0,0,0))
+#         mask = Image.new("RGB", (50, 50), (0, 0, 0))
+
+#     return mask
+#     # return images
+
+
+# Cấu hình 2
 def generate(text, count):
     if len(char_dict_8G) == 0:
         chars = read_chars(DATA_DIR_ROOT + 'ETL8G/chars.txt')
@@ -320,10 +505,49 @@ def generate(text, count):
             break
     if len(images) > 0:
         images = white_space_random(images)
-        w = 0
-        h = 127
+        img_transform = []
+        boxes = []
         for new_img in images:
-            w = w + new_img.width
+            new_img = np.array(new_img)
+            # print(new_img.shape)
+            # cv2.imwrite('or.jpg',new_img )
+            new_img = cv2.cvtColor(new_img, cv2.COLOR_RGB2GRAY)
+            # print(new_img.shape)
+            m = cv2.mean(new_img)
+            thresh = min(200, m[0])
+            _, new_img = cv2.threshold(new_img, thresh, 255, cv2.THRESH_BINARY_INV)
+            # cv2.imwrite('new.jpg',new_img)
+            coords = cv2.findNonZero(new_img)
+            x_coord,y_coord,w_coord,h_coord = cv2.boundingRect(coords)
+            boxes.append((x_coord,y_coord,w_coord,h_coord))
+            # crop_image = new_img[y_coord:y_coord+h_coord+10, x_coord:x_coord+w_coord+10]
+            # box=cv2.rectangle(crop_image, (x_coord, y_coord), (x_coord + w_coord, y_coord + h_coord), (0,0,255), 2)
+            # boxes.append(box)
+            # print(crop_image.shape)
+            # crop_image = 255 - crop_image
+            # img = Image.fromarray(crop_image)
+            
+            # img_transform.append(img)
+
+
+        w = 0
+        h_ = []
+        for i in range(len(images)):
+            x_coord, y_coord, w_coord, h_coord = boxes[i]
+            # print(x_coord, y_coord, w_coord, h_coord)
+            new_img = np.array(images[i])
+            distance_w = np.random.randint(0,35)
+            distance_h = np.random.randint(0,20)
+            if y_coord-distance_h <= 0:
+                crop_image = new_img[y_coord:y_coord+h_coord+distance_w, x_coord:x_coord+w_coord+distance_w]
+            else:
+                crop_image = new_img[y_coord-distance_h:y_coord+h_coord+distance_w, x_coord:x_coord+w_coord+distance_w]
+            crop_image = Image.fromarray(crop_image)
+            w = w + crop_image.width
+            h_.append(crop_image.height)
+            
+            img_transform.append(crop_image)
+        max_h = max(h_)
         # print(w)
         # w, h = images[0].width, images[0].height
         # index = 0
@@ -333,10 +557,10 @@ def generate(text, count):
         #         index = i
         #     else:
         #         continue
-        tiled = Image.new("RGB", (w, h), "white")
+        tiled = Image.new("RGB", (w, max_h), "white")
         tiled.save("bg.png")
         next_w = 0
-        for l in range(len(images)):
+        for l in range(len(img_transform)):
             # if l == index:
             #     img = white_blank_space_lv4
             #     img_next = Image.eval(images[l], lambda x: x) 
@@ -345,9 +569,9 @@ def generate(text, count):
             #     tiled.paste(img, (next_w,0))
             #     next_w = next_w + img_next.width
             # else:
-                img = Image.eval(images[l], lambda x: x)
+                img = Image.eval(img_transform[l], lambda x: x)
                 tiled.paste(img, (next_w, 0))
-                next_w = next_w + images[l].width
+                next_w = next_w + img_transform[l].width
         tiled.save("tiledfn.png")
         #create RGBA image and RGB mask
         image = tiled.convert("RGBA") #Image.new("RGBA", (tiled.width, tiled.height), (0,0,0,0))
@@ -366,28 +590,20 @@ def generate(text, count):
         mask = Image.new("RGB", (50, 50), (0, 0, 0))
 
     return mask
+    # return img_transform, mask, boxes
     # return images
-
 
 count = 0
 
-# def random_stretch(img):
-#     stretch = (random.random() - 0.5)  # -0.5 .. +0.5
-#     wStretched = max(int(img.shape[1] * (1 + stretch)), 1)  # random width, but at least 1
-#     img = cv2.resize(img, (wStretched, img.shape[0]))  # stretch horizontally by factor 0.5 .. 1.5
-#     return img
-
-
-# labels = ['仙台市泉区', '徳島市', '新潟市江南区', '高萩市', '一宮市']
 for label in tqdm(labels):
     for num in range(60):
         # print(num)
-        path = '../data/06062022/dataset/' + label + '/'
-        if os.path.isdir(path)==False: 
-            os.mkdir(path)
+        path = '/home/anlab/Tienanh-backup/TrainHWJapanese/data/08062022/final_08062022/' + label + '/'
+        if os.path.isdir(path)==False: os.mkdir(path)
         mask = generate(label, num)
-        # gray = cv2.cvtColor(mask,cv2.COLOR_BGR2GRAY)
         mask = np.array(mask)
+
+        
         new_height = 64
         new_width = int(new_height*mask.shape[1]/mask.shape[0])
         mask = cv2.resize(mask, (new_width, new_height))
@@ -403,19 +619,40 @@ for label in tqdm(labels):
         sharp = filters.unsharp_mask(division, radius=1.5, amount=2.5, multichannel=False, preserve_range=False)
         sharp = (255*sharp).clip(0,255).astype(np.uint8)
         # sharp = cv2.equalizeHist(sharp)
-        choice = random.uniform(0,1)
-        if choice > 0.2:
-            kernel = np.ones((3,3), np.uint8)
-            sharp = cv2.erode(sharp, kernel, iterations=1)
-        elif choice > 0.8 :
-            kernel = np.ones((3,3), np.uint8)
-            sharp = cv2.erode(sharp, kernel, iterations=1)
+        np.random.seed(2022)
+        choice_all = random.randint(0,2)
+        
 
+        if choice_all == 0:
+            choice = random.uniform(0,1)
+
+            if choice >= 0.7 and choice<=1:
+                kernel = np.ones((1,1), np.uint8)
+                sharp = cv2.erode(sharp, kernel, iterations=1)
+            elif choice >=0.4 and choice<0.7:
+                kernel = np.ones((2,2), np.uint8)
+                sharp = cv2.erode(sharp, kernel, iterations=1)
+            else: 
+                kernel = np.ones((3,3), np.uint8)
+                sharp = cv2.erode(sharp, kernel, iterations=1)
+
+        elif choice_all == 1:
+            kernel = np.ones((3,3), np.uint8)
+            sharp = cv2.erode(sharp, kernel, iterations=1)
             sharp = cv2.GaussianBlur(sharp, (3,3), 0)
-            plt.imshow(sharp, cmap='gray')
-
+            # plt.imshow(sharp, cmap='gray')
             kernel = np.ones((2,2), np.uint8)
             sharp = cv2.dilate(sharp, kernel, iterations=2)
+
+        else: 
+
+            kernel = np.ones((1,2), np.uint8)
+            sharp = cv2.dilate(sharp, kernel, iterations=1)
+
+            kernel = np.ones((2,2), np.uint8)
+            sharp = cv2.erode(sharp, kernel, iterations=1)
+
+
         img = Image.fromarray(sharp)
         # seq = Sequence([RandomRotate(3)])
         # img, _ = seq(sharp, bboxes)
@@ -424,7 +661,7 @@ for label in tqdm(labels):
         angle = random.uniform(-5,5)
         img = img.rotate(angle, 0, expand = 1, fillcolor = white)
 
-
+        blur = False
         choice = random.uniform(0,1)
         if choice > 0.1: 
             img = GaussianNoise()(img, mag=0)
@@ -433,10 +670,15 @@ for label in tqdm(labels):
         if choice > 0.2: 
             img = MotionBlur()(img, mag=0)
         choice = random.uniform(0,1)
-        if choice > 0.5:
-            img = DefocusBlur()(img, mag=0)
+        if choice > 0.7:
+            img = DefocusBlur()(img, mag=1)
+            blur = True
+        choice = random.uniform(0,1)
+        if choice > 0.8 and blur == False: 
+            img = Contrast()(img, mag=0)
+        choice = random.uniform(0,1)
+        img = np.array(img)
 
-
-        count += 1
-        cv2.imwrite(path+label+str(count)+'.jpg', img)
+        
+        cv2.imwrite(path+label+str(num)+'.jpg', img)
         # print(count, label)
