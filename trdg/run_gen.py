@@ -438,7 +438,7 @@ count = 0
 for label in tqdm(labels):
     for num in range(12):
         # print(num)
-        path = '/home/anlab/Tienanh-backup/TrainHWJapanese/data/09062022/dataset/' + label + '/'
+        path = '/home/anlab/Tienanh-backup/TrainHWJapanese/data/10062022/dataset/' + label + '/'
         if os.path.isdir(path)==False: os.mkdir(path)
         mask = generate(label, num)
         mask = np.array(mask)
@@ -495,19 +495,24 @@ for label in tqdm(labels):
         white = (255)
         angle = random.uniform(-5,5)
         img = img.rotate(angle, 0, expand = 1, fillcolor = white)
-
         choice = random.uniform(0,1)
+
         if choice > 0.1:
-            img = GaussianNoise()(img, mag=0)
-    
+            img = GaussianNoise()(img, mag=1)
+            img = ImpulseNoise()(img, mag=0)
         choice = random.uniform(0,1)
         if choice > 0.2:
             img = MotionBlur()(img, mag=0)
         choice = random.uniform(0,1)
         if choice > 0.7:
-            img = GaussianBlur()(img, mag=1)
-        img = np.array(img)
-
+            img = DefocusBlur()(img, mag=1)
+            blur = True
+        choice = random.uniform(0,1)
+        if choice > 0.8 and blur == True:
+            img = Contrast()(img, mag = 1)
+        choice = random.uniform(0,1)
+        if choice > 0.7:
+            img = Brightness()(img, mag = 0)
 
         img = np.array(img)
         
