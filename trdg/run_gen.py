@@ -596,11 +596,10 @@ def generate(text, count):
 count = 0
 
 for label in tqdm(labels):
-    for num in range(60):
-        # print(num)
-        path = '/home/anlab/Tienanh-backup/TrainHWJapanese/data/08062022/final_08062022/' + label + '/'
+    for i in range(10):
+        path = '/home/anlab/Tienanh-backup/TrainHWJapanese/data/add_2_final_07062022/' + label + '/'
         if os.path.isdir(path)==False: os.mkdir(path)
-        mask = generate(label, num)
+        mask = generate(label, i)
         mask = np.array(mask)
 
         
@@ -619,24 +618,14 @@ for label in tqdm(labels):
         sharp = filters.unsharp_mask(division, radius=1.5, amount=2.5, multichannel=False, preserve_range=False)
         sharp = (255*sharp).clip(0,255).astype(np.uint8)
         # sharp = cv2.equalizeHist(sharp)
-        np.random.seed(2022)
-        choice_all = random.randint(0,2)
-        
+        choice = random.uniform(0,1)
 
-        if choice_all == 0:
-            choice = random.uniform(0,1)
 
-            if choice >= 0.7 and choice<=1:
-                kernel = np.ones((1,1), np.uint8)
-                sharp = cv2.erode(sharp, kernel, iterations=1)
-            elif choice >=0.4 and choice<0.7:
-                kernel = np.ones((2,2), np.uint8)
-                sharp = cv2.erode(sharp, kernel, iterations=1)
-            else: 
-                kernel = np.ones((3,3), np.uint8)
-                sharp = cv2.erode(sharp, kernel, iterations=1)
 
-        elif choice_all == 1:
+        if choice > 0.2:
+            kernel = np.ones((3,3), np.uint8)
+            sharp = cv2.erode(sharp, kernel, iterations=1)
+        else:
             kernel = np.ones((3,3), np.uint8)
             sharp = cv2.erode(sharp, kernel, iterations=1)
             sharp = cv2.GaussianBlur(sharp, (3,3), 0)
@@ -644,13 +633,7 @@ for label in tqdm(labels):
             kernel = np.ones((2,2), np.uint8)
             sharp = cv2.dilate(sharp, kernel, iterations=2)
 
-        else: 
 
-            kernel = np.ones((1,2), np.uint8)
-            sharp = cv2.dilate(sharp, kernel, iterations=1)
-
-            kernel = np.ones((2,2), np.uint8)
-            sharp = cv2.erode(sharp, kernel, iterations=1)
 
 
         img = Image.fromarray(sharp)
@@ -661,7 +644,7 @@ for label in tqdm(labels):
         angle = random.uniform(-5,5)
         img = img.rotate(angle, 0, expand = 1, fillcolor = white)
 
-        blur = False
+
         choice = random.uniform(0,1)
         if choice > 0.1: 
             img = GaussianNoise()(img, mag=0)
@@ -672,13 +655,12 @@ for label in tqdm(labels):
         choice = random.uniform(0,1)
         if choice > 0.7:
             img = DefocusBlur()(img, mag=1)
-            blur = True
         choice = random.uniform(0,1)
-        if choice > 0.8 and blur == False: 
-            img = Contrast()(img, mag=0)
+        if choice > 0.3: 
+            img_ = Contrast()(img, mag=0)
         choice = random.uniform(0,1)
         img = np.array(img)
 
-        
-        cv2.imwrite(path+label+str(num)+'.jpg', img)
+        count += 1
+        cv2.imwrite(path+label+str(count)+'.jpg', img)
         # print(count, label)
