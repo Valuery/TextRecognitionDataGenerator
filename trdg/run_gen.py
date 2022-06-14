@@ -212,7 +212,7 @@ def white_space_random(images):
     for l in range(len(images)):
         img = Image.eval(images[l], lambda x: 255 - x)
         img = img.crop((28,0,128,127))
-        distance = np.random.randint(-35,0)
+        distance = np.random.randint(-30,0)
 
         new_width = img.width + distance
         new_img = Image.new("RGB", (new_width, 127), "white")
@@ -224,6 +224,9 @@ def white_space_random(images):
         # img = np.array(img)
         # seq = Sequence([RandomRotate(8)])
         # img, _ = seq(img, bboxes)
+        choice = random.uniform(0.85,1.15)
+        img = resize(img, int(img.width*choice), int(img.height*choice))
+
         white = (255,255,255)
         angle = random.uniform(-10,10)
         img = img.rotate(angle, 0, expand = 1, fillcolor = white)
@@ -266,7 +269,7 @@ def produce_image_bg(height, width, image_dir):
     else:
         raise Exception("No images where found in the images folder!")
 
-# Cấu hình 2 26052022
+# Cấu hình 2 06062022
 def generate(text, count):
     if len(char_dict_8G) == 0:
         chars = read_chars(DATA_DIR_ROOT + 'ETL8G/chars.txt')
@@ -379,7 +382,7 @@ count = 0
 for label in tqdm(labels):
     for num in range(60):
         # print(num)
-        path = '../data/26052022/dataset/' + label + '/'
+        path = '../data/06062022/dataset/' + label + '/'
         if os.path.isdir(path)==False: 
             os.mkdir(path)
         mask = generate(label, num)
@@ -400,15 +403,19 @@ for label in tqdm(labels):
         sharp = filters.unsharp_mask(division, radius=1.5, amount=2.5, multichannel=False, preserve_range=False)
         sharp = (255*sharp).clip(0,255).astype(np.uint8)
         # sharp = cv2.equalizeHist(sharp)
+        choice = random.uniform(0,1)
+        if choice > 0.2:
+            kernel = np.ones((3,3), np.uint8)
+            sharp = cv2.erode(sharp, kernel, iterations=1)
+        elif choice > 0.8 :
+            kernel = np.ones((3,3), np.uint8)
+            sharp = cv2.erode(sharp, kernel, iterations=1)
 
-        kernel = np.ones((3,3), np.uint8)
-        sharp = cv2.erode(sharp, kernel, iterations=1)
+            sharp = cv2.GaussianBlur(sharp, (3,3), 0)
+            plt.imshow(sharp, cmap='gray')
 
-        sharp = cv2.GaussianBlur(sharp, (3,3), 0)
-        plt.imshow(sharp, cmap='gray')
-
-        kernel = np.ones((2,2), np.uint8)
-        sharp = cv2.dilate(sharp, kernel, iterations=2)
+            kernel = np.ones((2,2), np.uint8)
+            sharp = cv2.dilate(sharp, kernel, iterations=2)
         img = Image.fromarray(sharp)
         # seq = Sequence([RandomRotate(3)])
         # img, _ = seq(sharp, bboxes)
@@ -428,13 +435,7 @@ for label in tqdm(labels):
         choice = random.uniform(0,1)
         if choice > 0.5:
             img = DefocusBlur()(img, mag=0)
-        choice = random.uniform(0,1)
-        if choice > 0.3: 
-            img_ = Contrast()(img, mag=0)
-        choice = random.uniform(0,1)
-        if choice > 0.4 : 
-            img = Color()(img_, mag=0)
-        img = np.array(img)
+
 
         count += 1
         cv2.imwrite(path+label+str(count)+'.jpg', img)
