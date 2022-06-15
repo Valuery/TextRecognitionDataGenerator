@@ -25,7 +25,7 @@ from straug.process import Posterize, Solarize, Invert, Equalize, AutoContrast, 
 
 from tqdm import tqdm
 
-DATA_DIR_ROOT = '/home/anlab/Tienanh-backup/TrainHWJapanese/data/ETLCDB/'
+DATA_DIR_ROOT = '../data/ETLCDB/'
 NUMBER_DATASET = 160
 
 data_format = None
@@ -425,10 +425,6 @@ def generate(text, count):
         mask = Image.new("RGB", (50, 50), (0, 0, 0))
 
     return mask
-    # return img_transform, mask, boxes
-    # # return images
-    # # return img_transform, mask, boxes
-    # # return images
 
 count = 0
 
@@ -438,7 +434,7 @@ count = 0
 for label in tqdm(labels):
     for num in range(12):
         # print(num)
-        path = '/home/anlab/Tienanh-backup/TrainHWJapanese/data/10062022/dataset/' + label + '/'
+        path = '../data/11062022/dataset/' + label + '/'
         if os.path.isdir(path)==False: os.mkdir(path)
         mask = generate(label, num)
         mask = np.array(mask)
@@ -472,14 +468,6 @@ for label in tqdm(labels):
             else: 
                 kernel = np.ones((3,3), np.uint8)
                 sharp = cv2.erode(sharp, kernel, iterations=1)
-
-        # elif choice_all == 1:
-        #     kernel = np.ones((3,3), np.uint8)
-        #     sharp = cv2.erode(sharp, kernel, iterations=1)
-        #     sharp = cv2.GaussianBlur(sharp, (3,3), 0)
-        #     # plt.imshow(sharp, cmap='gray')
-        #     kernel = np.ones((2,2), np.uint8)
-        #     sharp = cv2.dilate(sharp, kernel, iterations=2)
 
         elif choice_all == 1: 
             kernel = np.ones((1,2), np.uint8)
