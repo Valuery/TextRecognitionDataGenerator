@@ -1,3 +1,6 @@
+# Chỉnh lại đường dẫn data dòng 28
+# Chỉnh lại đường dẫn output dòng 505
+# Mở comment dòng 546, 547 để mở noise
 from PIL import Image
 import bitstring
 import jaconv
@@ -205,38 +208,62 @@ def resize(image_pil, width, height):
     return background.convert('RGB')
 
 
-
-
 def white_space_random(images):
     new_images = []
     for l in range(len(images)):
         img = Image.eval(images[l], lambda x: 255 - x)
         img = img.crop((28,0,128,127))
-        distance = np.random.randint(-30,0)
 
+        distance = np.random.randint(-30,0)
+        
         new_width = img.width + distance
         new_img = Image.new("RGB", (new_width, 127), "white")
         new_img.paste(img,(0,0))
- 
         new_images.append(new_img)
     image_rotate = []
     for img in new_images:
         # img = np.array(img)
         # seq = Sequence([RandomRotate(8)])
         # img, _ = seq(img, bboxes)
-        choice = random.uniform(0.85,1.25)
-        img = resize(img, int(img.width*choice), int(img.height*choice))
+        # print(img.size)
+        img = np.array(img)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        choice_all = random.randint(0,1)
+
+        if choice_all == 0:
+            choice = random.uniform(0,1)
+
+            if choice >= 0.8 and choice<=1:
+                kernel = np.ones((2,2), np.uint8)
+                img = cv2.erode(img, kernel, iterations=2)
+            else: 
+                kernel = np.ones((5,5), np.uint8)
+                img = cv2.erode(img, kernel, iterations=1)
+
+        elif choice_all == 1: 
+
+            kernel = np.ones((2,2), np.uint8)
+            img = cv2.dilate(img, kernel, iterations=2)
+
+            kernel = np.ones((4,4), np.uint8)
+            img = cv2.erode(img, kernel, iterations=1)
+        img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
+        img = Image.fromarray(img)
+        # choice = random.uniform(0.85,1.15)
+        # img = resize(img, int(img.width*choice), int(img.height*choice))
         
         white = (255,255,255)
         angle = random.uniform(-10,10)
         img = img.rotate(angle, 0, expand = 1, fillcolor = white)
+        # print(img.size)
         
+        # img.show()
         # img = Image.fromarray(img)
         # img.show()
         image_rotate.append(img)    
         
     return image_rotate
-
 def produce_image_bg(height, width, image_dir):
     """
         Create a background with a image
@@ -274,6 +301,7 @@ def produce_image_bg(height, width, image_dir):
 
 
 # Cấu hình 2 08062022 - fixed
+# Cấu hình 2
 def generate(text, count):
     if len(char_dict_8G) == 0:
         chars = read_chars(DATA_DIR_ROOT + 'ETL8G/chars.txt')
@@ -339,14 +367,6 @@ def generate(text, count):
             coords = cv2.findNonZero(new_img)
             x_coord,y_coord,w_coord,h_coord = cv2.boundingRect(coords)
             boxes.append((x_coord,y_coord,w_coord,h_coord))
-            # crop_image = new_img[y_coord:y_coord+h_coord+10, x_coord:x_coord+w_coord+10]
-            # box=cv2.rectangle(crop_image, (x_coord, y_coord), (x_coord + w_coord, y_coord + h_coord), (0,0,255), 2)
-            # boxes.append(box)
-            # print(crop_image.shape)
-            # crop_image = 255 - crop_image
-            # img = Image.fromarray(crop_image)
-            
-            # img_transform.append(img)
 
 
         w = 0
@@ -356,32 +376,51 @@ def generate(text, count):
             # print(x_coord, y_coord, w_coord, h_coord)
             new_img = np.array(images[i])
             # distance_w = np.random.randint(0,35)
-            distance_h = np.random.randint(0,5)
-            if x_coord == 0 or y_coord == 0 or w_coord == 0 or h_coord == 0:
-                crop_image = new_img
-                crop_image = Image.fromarray(crop_image)
-            else:
-                crop_image = new_img[y_coord:y_coord+h_coord, x_coord:x_coord+w_coord]
-                crop_image = Image.fromarray(crop_image)
-            
-                
-            if crop_image.width > 100:
-                distance_w = np.random.randint(-10,0)
-            else:
-                distance_w = np.random.randint(0,40)
+            distance_h = np.random.randint(0,10)
 
-            new_width = crop_image.width + distance_w
-            # print(new_width)
-            new_crop_img = Image.new("RGB", (new_width, 127+distance_h), "white")
-            # print(new_crop_img.size)
-            paste_x_coord = np.random.randint(0,10)
-            paste_y_coord = np.random.randint(0,30)
-            new_crop_img.paste(crop_image,(paste_x_coord,25))
-            # print(new_crop_img.size)
+            choice = random.randint(0,1)
+            if choice == 1:
+                if x_coord == 0 or y_coord == 0 or w_coord == 0 or h_coord == 0:
+                    crop_image = new_img
+                    crop_image = Image.fromarray(crop_image)
+                else:
+                    crop_image = new_img[y_coord:y_coord+h_coord, x_coord:x_coord+w_coord]
+                    crop_image = Image.fromarray(crop_image)
+                
+                    
+                if crop_image.width > 120:
+                    distance_w = np.random.randint(-10,0)
+                else:
+                    distance_w = np.random.randint(0,40)
+
+                new_width = crop_image.width + distance_w
+                # print(new_width)
+                new_crop_img = Image.new("RGB", (new_width, 127+distance_h), "white")
+                # print(new_crop_img.size)
+                paste_x_coord = np.random.randint(0,10)
+                paste_y_coord = np.random.randint(0,30)
+                new_crop_img.paste(crop_image,(paste_x_coord,20))
+                # print(new_crop_img.size)
+
+            else:
+                if x_coord == 0 or y_coord == 0 or w_coord == 0 or h_coord == 0:
+                    crop_image = new_img
+                    crop_image = Image.fromarray(crop_image)
+                else:
+                    crop_image = new_img[y_coord:y_coord+h_coord, x_coord:x_coord+w_coord]
+                    crop_image = Image.fromarray(crop_image)
+                new_width = crop_image.width
+                new_crop_img = Image.new("RGB", (new_width, 127+distance_h), "white")
+                # print(new_crop_img.size)
+
+                new_crop_img.paste(crop_image,(0,20))
+
+
+
             w = w + new_crop_img.width
             h_.append(new_crop_img.height)
             
-            img_transform.append(new_crop_img)
+            img_transform.append(new_crop_img)    
         max_h = max(h_)
         # print(w)
         # w, h = images[0].width, images[0].height
@@ -392,8 +431,14 @@ def generate(text, count):
         #         index = i
         #     else:
         #         continue
+        
+        
         tiled = Image.new("RGB", (w, max_h), "white")
         tiled.save("bg.png")
+
+        # tiled = produce_image_bg(max_h , w, '/home/anlab/Tienanh-backup/TrainHWJapanese/TextRecognitionDataGenerator/trdg/bg_img')
+        # tiled.save("bg.png")
+        
         next_w = 0
         for l in range(len(img_transform)):
             # if l == index:
@@ -425,35 +470,60 @@ def generate(text, count):
         mask = Image.new("RGB", (50, 50), (0, 0, 0))
 
     return mask
-    # return img_transform, mask, boxes
-    # # return images
-    # # return img_transform, mask, boxes
-    # # return images
+
+
+# import numpy as np
+
+# from scipy.ndimage.filters import gaussian_filter
+# from scipy.ndimage.interpolation import map_coordinates
+
+# def elastic_transform(image, alpha_range, sigma, random_state=None):
+
+#     if random_state is None:
+#         random_state = np.random.RandomState(None)
+        
+#     if np.isscalar(alpha_range):
+#         alpha = alpha_range
+#     else:
+#         alpha = np.random.uniform(low=alpha_range[0], high=alpha_range[1])
+
+#     shape = image.shape
+#     dx = gaussian_filter((random_state.rand(*shape) * 2 - 1), sigma) * alpha
+#     dy = gaussian_filter((random_state.rand(*shape) * 2 - 1), sigma) * alpha
+
+#     x, y, z = np.meshgrid(np.arange(shape[0]), np.arange(shape[1]), np.arange(shape[2]), indexing='ij')
+#     indices = np.reshape(x+dx, (-1, 1)), np.reshape(y+dy, (-1, 1)), np.reshape(z, (-1, 1))
+
+#     return map_coordinates(image, indices, order=1, mode='reflect').reshape(shape)
+
+
+
 
 count = 0
-
-
-
-# labels = ['仙台市泉区', '徳島市', '新潟市江南区', '高萩市', '一宮市']
+# l = '福山市', '犬山市', '大阪市東住吉区', '高萩市', '大田区', '岡山市中区', '神戸市灘区', '上川郡鷹栖町', '一宮市', '坂東市'
+# labels = [ '滝川市', '大津市' ,'上川郡鷹栖町' , '徳島市', '神戸市灘区', '守山市', '大阪市東住吉区', '呉市', '嘉麻市', '近江八幡市', '犬山市' ,'一宮市', '西宮市', '神戸市灘区', '寒河江市', '相模原市南区']
 for label in tqdm(labels):
-    for num in range(12):
+    for num in range(78):
         # print(num)
-        path = '/home/anlab/Tienanh-backup/TrainHWJapanese/data/10062022/dataset/' + label + '/'
+        path = '/home/anlab/Tienanh-backup/TrainHWJapanese/data/24062022/dataset/' + label + '/'
         if os.path.isdir(path)==False: os.mkdir(path)
         mask = generate(label, num)
         mask = np.array(mask)
+        mask = cv2.cvtColor(mask, cv2.COLOR_RGB2GRAY)
         # print(mask.shape)
         
         new_height = 64
         new_width = int(new_height*mask.shape[1]/mask.shape[0])
         mask = cv2.resize(mask, (new_width, new_height))
-        gray = cv2.cvtColor(mask,cv2.COLOR_BGR2GRAY)
+        # gray = cv2.cvtColor(mask,cv2.COLOR_BGR2GRAY)
 
         # blur
-        smooth = cv2.GaussianBlur(gray, (33,33), 0)
+        smooth = cv2.GaussianBlur(mask, (33,33), 0)
 
         # divide gray by morphology image
-        division = cv2.divide(gray, smooth, scale=255)
+        division = cv2.divide(mask, smooth, scale=255)
+
+
 
         # sharpen using unsharp masking
         sharp = filters.unsharp_mask(division, radius=1.5, amount=2.5, multichannel=False, preserve_range=False)
@@ -463,30 +533,6 @@ for label in tqdm(labels):
         choice_all = random.randint(0,1)
         
 
-        if choice_all == 0:
-            choice = random.uniform(0,1)
-
-            if choice >= 0.8 and choice<=1:
-                kernel = np.ones((2,2), np.uint8)
-                sharp = cv2.erode(sharp, kernel, iterations=2)
-            else: 
-                kernel = np.ones((3,3), np.uint8)
-                sharp = cv2.erode(sharp, kernel, iterations=1)
-
-        # elif choice_all == 1:
-        #     kernel = np.ones((3,3), np.uint8)
-        #     sharp = cv2.erode(sharp, kernel, iterations=1)
-        #     sharp = cv2.GaussianBlur(sharp, (3,3), 0)
-        #     # plt.imshow(sharp, cmap='gray')
-        #     kernel = np.ones((2,2), np.uint8)
-        #     sharp = cv2.dilate(sharp, kernel, iterations=2)
-
-        elif choice_all == 1: 
-            kernel = np.ones((1,2), np.uint8)
-            sharp = cv2.dilate(sharp, kernel, iterations=1)
-
-            kernel = np.ones((2,2), np.uint8)
-            sharp = cv2.erode(sharp, kernel, iterations=1)
 
         img = Image.fromarray(sharp)
         # seq = Sequence([RandomRotate(3)])
@@ -495,25 +541,26 @@ for label in tqdm(labels):
         white = (255)
         angle = random.uniform(-5,5)
         img = img.rotate(angle, 0, expand = 1, fillcolor = white)
-        choice = random.uniform(0,1)
 
-        if choice > 0.1:
-            img = GaussianNoise()(img, mag=1)
-            img = ImpulseNoise()(img, mag=0)
-        choice = random.uniform(0,1)
-        if choice > 0.2:
-            img = MotionBlur()(img, mag=0)
+        blur = False
+        # choice = random.uniform(0,1)
+        # if choice > 0.4:
+        #     img = GaussianNoise()(img, mag=0)
+            
+        # choice = random.uniform(0,1)
+        # if choice > 0.4:
+        #     img = MotionBlur()(img, mag=0)
         choice = random.uniform(0,1)
         if choice > 0.7:
-            img = DefocusBlur()(img, mag=1)
+            img = DefocusBlur()(img, mag=0)
             blur = True
         choice = random.uniform(0,1)
         if choice > 0.8 and blur == True:
-            img = Contrast()(img, mag = 1)
+            img = Contrast()(img, mag = 0)
         choice = random.uniform(0,1)
-        if choice > 0.7:
-            img = Brightness()(img, mag = 0)
 
+        if choice > 0.7: 
+            img = Brightness()(img, mag = 0)
         img = np.array(img)
         
         cv2.imwrite(path+label+str(num)+'.jpg', img)
